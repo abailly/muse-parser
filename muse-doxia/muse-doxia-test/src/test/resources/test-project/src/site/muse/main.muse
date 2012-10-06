@@ -1,0 +1,2 @@
+this is test in **bold**
+this is an [[link.muse][link]]

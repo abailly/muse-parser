@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="Muse in Java">
+<!--
+ <bannerLeft>
+  <name>JAuto</name>
+  <src>http://maven.apache.org/images/apache-maven-project.png</src>
+  <href>http://maven.apache.org/</href>
+ </bannerLeft>
+ <bannerRight>
+  <src>http://maven.apache.org/images/maven-small.gif</src>
+ </bannerRight>
+-->
+  <skin>
+      <groupId>org.apache.maven.skins</groupId>
+      <artifactId>maven-stylus-skin</artifactId>
+      <version>1.0</version>
+  </skin>
+
+  <poweredBy>
+   <logo
+    name="Powered by Emacs Muse"
+    href="http://www.mwolson.org/projects/EmacsMuse.html"       
+    img="images/muse-powered-by.png"/>
+   <logo
+    name="Build with Maven 2"
+    href="http://maven.apache.org"
+    img="images/logos/maven-feather.png"/>
+   <logo
+    name="Sponsored by OQube"
+    href="http://www.oqube.com"
+    img="images/oqube.png"/>
+  </poweredBy>  
+
+ <body>
+  <links>
+   <item name="Maven" href="http://maven.apache.org/"/>
+  </links>
+
+
+  <menu name="Muse-in-Java" >
+   <item name="Introduction" href="index.html"/>
+   <item name="Downloads" href="download.html"/>
+  </menu>
+  
+  <menu name="Muse and maven" >
+   <item name="Project documentation with muse" href="maven-muse.html"/>
+   <item name="Literate muse plugin" href="muse-maven-plugin/index.html"/>
+  </menu>
+
+  <menu name="Components" ref="modules" />
+
+ </body>
+</project>

@@ -1,0 +1,32 @@
+<?xml version="1.0"?><project>
+ <parent>
+  <groupId>oqube.muse</groupId>
+  <artifactId>muse-doxia</artifactId>
+  <version>1.0-SNAPSHOT</version>
+ </parent>
+  <groupId>oqube.muse</groupId>
+  <artifactId>muse-doxia-module</artifactId>
+  <version>1.0-SNAPSHOT</version>
+ <modelVersion>4.0.0</modelVersion>
+ <name>Muse :: Doxia :: Module</name>
+ <packaging>jar</packaging>
+ <description>A Doxia module for EmacsMuse document format.</description>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-maven-plugin</artifactId>
+        <version>1.3.5</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>descriptor</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

@@ -1,0 +1,31 @@
+#author abailly@oqube.com
+
+An example file for source handling in literate programs with
+different formats.
+This file contain fragments with references in them.
+
+
+
+<source language="haskell">
+class Typeable a => Data a where
+  -- | Left-associative fold operation for constructor applications
+  gfoldl  :: (forall a b. Data a => c (a -> b) -> a -> c b)
+          -> (forall g. g -> c g)
+          -> a -> c a
+
+  -- | Obtaining the constructor from a given datum.
+  toConstr   :: a -> Constr
+
+  -- | Provide access to list of all constructors
+  dataTypeOf  :: a -> DataType
+
+  -- | A generic transformation that maps over the immediate subterms
+  gmapT :: (forall b. Data b => b -> b) -> a -> a
+
+  -- | A generic query that processes the immediate subterms and returns a list
+  gmapQ :: (forall a. Data a => a -> u) -> a -> [u]
+
+  -- | A generic monadic transformation that maps over the immediate subterms
+  gmapM   :: Monad m => (forall a. Data a => a -> m a) -> a -> m a
+
+</source>

@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html><head>
+
+
+
+<link rel="stylesheet" href="genuine_fichiers/site.css">
+<script language="JavaScript"><!--
+function startTimer() {
+    var now = new Date();
+    var minutes = now.getMinutes();
+    var seconds = now.getSeconds();
+    setTimeout('refresh()',60000);
+}
+
+function refresh() {
+    window.location.reload();
+}
+
+startTimer();
+//--></script>
+<meta name="title" content="Environnement des tests d'acceptation automatisé"><meta name="author" content="Arnaud Bailly"></head><body>
+<p>En mode <em>batch</em>, les tests doivent être exécutés dans le
+contexte du système de la Gate sans perturber celui-ci. Nous détaillons
+ici deux procédures: </p><ul><li>une procédure pour exécuter les tests
+au sein d'une machine virtuelle QEmu en utilisant un disque secondaire
+pour stocker l'ensemble de l'environnement de test; </li>
+<li>une procédure pour exécuter les tests directement sur la Gate en utilisant une connexion réseau. </li>
+</ul>
+
+<h1>Emulation de la Gate </h1>
+<p>La page <a href="http://localhost:4444/Virtualization.html">Virtualisation</a>
+détaille la procédure pour créer un disque virtuel contenant plusieurs
+partitions. Dans le cas présent, une seule partition est nécessaire.
+Elle contiendra l'ensemble des <em>suites de tests</em> et l'environnement nécessaire à leur exécution.  </p>
+<p>Monter la partition créée sur le système de fichier virtuel dans un répertoire du système hôte: </p><pre class="code">$&gt; sudo losetup /dev/loop0 image-tests.ext3
+$&gt; sudo losetup -o 32256 /dev/loop1 /dev/loop1
+$&gt; sudo mount /dev/loop1 tests
+</pre>
+<p>Construire un environnement Python <em>complet</em> spécifiquement compilé pour le système EasysGate: </p>
+<p>Construire l'environnement sur le disque: </p><pre class="code">$&gt; cd tests
+$&gt; cp -fr /dir/to/python2.4/* .
+$&gt; cp -fr /dir/to/htmltests/* .
+$&gt; cp -fr /dir/to/testfixtures/* .
+$&gt; cp -fr /dir/to/testsupport/* .
+</pre>
+<div name="bibliography" id="bibliography">
+<span class="bibtex.title">Bibliographie</span></div>
+</body></html>

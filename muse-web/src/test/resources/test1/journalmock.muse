@@ -1,0 +1,16 @@
+* 20080929: Testing OQube web site
+
+Started to write tests for OQube's site
+
+* 20080917: Interesting variation around Form validation problem
+
+checks appropriate constraints and throws unchecked exception upon
+
+* 20080909: Dojo de lundi
+
+Un dojo inspiré de 
+
+* 20080909: Builder Tester agent
+
+Test executions is OK, both for failures and successes, but I suspect
+reporting is rather lame. This shall be improved later on. My goal is

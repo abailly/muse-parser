@@ -1,0 +1,877 @@
+Index: doxia-core/src/main/java/org/apache/maven/doxia/module/muse/MuseDoxiaLinker.java
+===================================================================
+--- doxia-core/src/main/java/org/apache/maven/doxia/module/muse/MuseDoxiaLinker.java	(révision 0)
++++ doxia-core/src/main/java/org/apache/maven/doxia/module/muse/MuseDoxiaLinker.java	(révision 0)
+@@ -0,0 +1,94 @@
++/*
++ *  Copyright 2006 OQube contact at oqube dot com
++ *
++ *  Licensed under the Apache License, Version 2.0 (the "License");
++ *  you may not use this file except in compliance with the License.
++ *  You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing, software
++ *  distributed under the License is distributed on an "AS IS" BASIS,
++ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ *  See the License for the specific language governing permissions and
++ *  limitations under the License.
++ */
++package org.apache.maven.doxia.module.muse;
++
++import java.util.regex.Matcher;
++import java.util.regex.Pattern;
++
++import oqube.muse.MuseLinker;
++import oqube.muse.MuseSink;
++
++import org.apache.maven.doxia.sink.Sink;
++
++/**
++ * Basic linker for Doxia-muse integration. This linker is very crude: It transforms URL likely to point to images as
++ * inline images, URLs for muse pages in relative links and output all other URLS as is.
++ * 
++ * @author abailly@oqube.com
++ * @version $Id$
++ * @plexus.component role="oqube.muse.MuseLinker" role-hint="muse-doxia"
++ */
++public class MuseDoxiaLinker implements MuseLinker
++{
++
++    /*
++     *  (non-Javadoc)
++     * @see oqube.muse.MuseLinker#link(oqube.muse.MuseSink, java.lang.String, java.lang.String)
++     */
++    public void link( MuseSink sk, String s, String t )
++    {
++        /* extract real Sink */
++        Sink sink = ( (SinkWrapper) sk ).getSink();
++        /* handle different subcases */
++        Pattern imgs = Pattern.compile( ".*(\\.jpeg|\\.png|\\.gif)" );
++        Pattern muse = Pattern.compile( "([^.#]*)(\\.muse)?(:?#(\\w+))?" );
++        Matcher m = imgs.matcher( s );
++        if ( m.matches() )
++        { // an image
++            sink.figureGraphics( s );
++            return;
++        }
++        // t may be empty
++        if ( t == null || "".equals( t ) )
++            t = s;
++        m = muse.matcher( s );
++        if ( m.matches() )
++        {
++            // a muse link - always output an html link which is bad
++            // if uri does not start with a slash, add it
++            String uri = m.group( 1 );
++            if ( uri == null || uri.length() == 0 )
++            {
++                assert m.group( 4 ) != null;
++                sink.link( "#" + m.group( 4 ) );
++            }
++            else if ( m.group( 3 ) != null ) // link with an anchor
++                sink.link( uri + ".html#" + m.group( 4 ) );
++            else
++                sink.link( uri + ".html" );
++            sink.text( t );
++            sink.link_();
++        }
++        else
++        {
++            sink.link( s );
++            sink.text( t );
++            sink.link_();
++        }
++    }
++
++    /*
++     *  (non-Javadoc)
++     * @see oqube.muse.MuseLinker#anchor(oqube.muse.MuseSink, java.lang.String)
++     */
++    public void anchor( MuseSink sk, String s )
++    {
++        /* extract real Sink */
++        Sink sink = ( (SinkWrapper) sk ).getSink();
++        sink.anchor( s );
++        sink.anchor_();
++    }
++}
+
+Modification de propriétés sur doxia-core/src/main/java/org/apache/maven/doxia/module/muse/MuseDoxiaLinker.java
+___________________________________________________________________
+Nom : svn:mime-type
+   + text/plain
+Nom : svn:keywords
+   + Date Revision Id
+Nom : svn:eol-style
+   + native
+
+Index: doxia-core/src/main/java/org/apache/maven/doxia/module/muse/MuseSiteModule.java
+===================================================================
+--- doxia-core/src/main/java/org/apache/maven/doxia/module/muse/MuseSiteModule.java	(révision 0)
++++ doxia-core/src/main/java/org/apache/maven/doxia/module/muse/MuseSiteModule.java	(révision 0)
+@@ -0,0 +1,54 @@
++/*
++ *  Copyright 2006 OQube contact at oqube dot com
++ *
++ *  Licensed under the Apache License, Version 2.0 (the "License");
++ *  you may not use this file except in compliance with the License.
++ *  You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing, software
++ *  distributed under the License is distributed on an "AS IS" BASIS,
++ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ *  See the License for the specific language governing permissions and
++ *  limitations under the License.
++ */
++package org.apache.maven.doxia.module.muse;
++
++import org.apache.maven.doxia.site.module.SiteModule;
++
++/**
++ * Implementation of SiteModule for the muse format.
++ * 
++ * 
++ * @author oqube
++ * @plexus.component role="org.apache.maven.doxia.site.module.SiteModule" role-hint="muse"
++ */
++public final class MuseSiteModule implements SiteModule
++{
++
++    /**
++     * @see SiteModule#getSourceDirectory()
++     */
++    public String getSourceDirectory()
++    {
++        return "muse";
++    }
++
++    /**
++     * @see SiteModule#getExtension()
++     */
++    public String getExtension()
++    {
++        return "muse";
++    }
++
++    /**
++     * @see SiteModule#getParserId()
++     */
++    public String getParserId()
++    {
++        return "muse";
++    }
++
++}
+
+Modification de propriétés sur doxia-core/src/main/java/org/apache/maven/doxia/module/muse/MuseSiteModule.java
+___________________________________________________________________
+Nom : svn:eol-style
+   + native
+
+Index: doxia-core/src/main/java/org/apache/maven/doxia/module/muse/SinkWrapper.java
+===================================================================
+--- doxia-core/src/main/java/org/apache/maven/doxia/module/muse/SinkWrapper.java	(révision 0)
++++ doxia-core/src/main/java/org/apache/maven/doxia/module/muse/SinkWrapper.java	(révision 0)
+@@ -0,0 +1,369 @@
++/*
++ *  Copyright 2006 OQube contact at oqube dot com
++ *
++ *  Licensed under the Apache License, Version 2.0 (the "License");
++ *  you may not use this file except in compliance with the License.
++ *  You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing, software
++ *  distributed under the License is distributed on an "AS IS" BASIS,
++ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ *  See the License for the specific language governing permissions and
++ *  limitations under the License.
++ */
++package org.apache.maven.doxia.module.muse;
++
++import java.io.PrintWriter;
++
++import oqube.muse.MuseLinker;
++import oqube.muse.MuseSink;
++import oqube.muse.MuseTagHandler;
++
++import org.apache.maven.doxia.sink.Sink;
++
++/**
++ * This class wraps a doxia sink into a muse sink.
++ * 
++ * @author abailly@oqube.muse.com
++ * @version $Id$
++ * @plexus.component role="oqube.muse.MuseSink" role-hint="muse-doxia"
++ */
++public class SinkWrapper implements MuseSink
++{
++
++    /**
++     * @plexus.requirement role="oqube.muse.MuseLinker" role-hint="muse-doxia"
++     */
++    private MuseLinker linker;
++
++    /**
++     * @plexus.requirement role="oqube.muse.MuseTagHandler" role-hint="muse-xhtml"
++     */
++    private MuseTagHandler tagHandler;
++
++    /*
++     * actual wrapped sink.
++     */
++    private Sink sink;
++
++    public Sink getSink()
++    {
++        return sink;
++    }
++
++    public void setSink( Sink sink )
++    {
++        this.sink = sink;
++    }
++
++    public void setLineWidth( int lw )
++    {
++    }
++
++    public void startHeader()
++    {
++        sink.head();
++    }
++
++    public void endHeader()
++    {
++        sink.head_();
++    }
++
++    public void startBody()
++    {
++        sink.body();
++    }
++
++    public void endBody()
++    {
++        sink.body_();
++    }
++
++    public void startFooter()
++    {
++    }
++
++    public void endFooter()
++    {
++    }
++
++    public void startPara()
++    {
++        sink.paragraph();
++    }
++
++    public void text( String txt )
++    {
++        sink.text( txt );
++    }
++
++    public void endPara()
++    {
++        sink.paragraph_();
++    }
++
++    public void startList()
++    {
++        sink.list();
++    }
++
++    public void endList()
++    {
++        sink.list_();
++    }
++
++    public void startItem()
++    {
++        sink.listItem();
++    }
++
++    public void endItem()
++    {
++        sink.listItem_();
++    }
++
++    public void startQuote()
++    {
++        sink.paragraph();
++    }
++
++    public void endQuote()
++    {
++        sink.paragraph_();
++    }
++
++    public void startCenter()
++    {
++        sink.paragraph();
++    }
++
++    public void endCenter()
++    {
++        sink.paragraph_();
++    }
++
++    public void startEnums()
++    {
++        sink.numberedList( Sink.NUMBERING_DECIMAL );
++    }
++
++    public void endEnums()
++    {
++        sink.numberedList_();
++    }
++
++    public void startTitle1()
++    {
++        sink.sectionTitle1();
++    }
++
++    public void endTitle1()
++    {
++        sink.sectionTitle1_();
++    }
++
++    public void startTitle2()
++    {
++        sink.sectionTitle2();
++    }
++
++    public void endTitle2()
++    {
++        sink.sectionTitle2_();
++    }
++
++    public void startTitle3()
++    {
++        sink.sectionTitle3();
++    }
++
++    public void endTitle3()
++    {
++        sink.sectionTitle3_();
++    }
++
++    public void startTitle4()
++    {
++        sink.sectionTitle4();
++    }
++
++    public void endTitle4()
++    {
++        sink.sectionTitle4_();
++    }
++
++    public void startEmph()
++    {
++        sink.italic();
++    }
++
++    public void endEmph()
++    {
++        sink.italic_();
++    }
++
++    public void startStrong()
++    {
++        sink.bold();
++    }
++
++    public void endStrong()
++    {
++        sink.bold_();
++    }
++
++    public void startVerb()
++    {
++        sink.monospaced();
++    }
++
++    public void endVerb()
++    {
++        sink.monospaced_();
++    }
++
++    public void startUline()
++    {
++    }
++
++    public void endUline()
++    {
++    }
++
++    public void link( String s, String t )
++    {
++        linker.link( this, s, t );
++    }
++
++    public void anchor( String anchor )
++    {
++        linker.anchor( this, anchor );
++    }
++
++    public void addMetadata( String s, String t )
++    {
++        tagHandler.flow( this, s, null, t );
++    }
++
++    public void separator()
++    {
++        sink.horizontalRule();
++    }
++
++    public void rawText( String text )
++    {
++        sink.rawText( text );
++    }
++
++    public void startDocument()
++    {
++    }
++
++    public void endDocument()
++    {
++        sink.flush();
++        sink.close();
++    }
++
++    public void startTable()
++    {
++        sink.table();
++    }
++
++    public void endTable()
++    {
++        sink.table_();
++    }
++
++    public void startTableHeader()
++    {
++        sink.tableHeaderCell();
++    }
++
++    public void endTableHeader()
++    {
++        sink.tableHeaderCell_();
++    }
++
++    public void startTableData()
++    {
++        sink.tableCell();
++    }
++
++    public void endTableData()
++    {
++        sink.tableCell_();
++    }
++
++    public void startTableRow()
++    {
++        sink.tableRow();
++    }
++
++    public void endTableRow()
++    {
++        sink.tableRow_();
++    }
++
++    /*
++     * (non-Javadoc)
++     * 
++     * @see oqube.muse.MuseSink#block(java.lang.String, java.lang.String[][], java.lang.String)
++     */
++    public void block( String arg0, String[][] arg1, String arg2 )
++    {
++        tagHandler.block( this, arg0, arg1, arg2 );
++    }
++
++    /*
++     * (non-Javadoc)
++     * 
++     * @see oqube.muse.MuseSink#flow(java.lang.String, java.lang.String[][], java.lang.String)
++     */
++    public void flow( String arg0, String[][] arg1, String arg2 )
++    {
++        tagHandler.block( this, arg0, arg1, arg2 );
++    }
++
++    /*
++     * (non-Javadoc)
++     * 
++     * @see oqube.muse.MuseSink#setEncoding(java.lang.String)
++     */
++    public void setEncoding( String arg0 )
++    {
++    }
++
++    /*
++     * (non-Javadoc)
++     * 
++     * @see oqube.muse.MuseSink#setOut(java.io.PrintWriter)
++     */
++    public void setOut( PrintWriter arg0 )
++    {
++    }
++
++    /*
++     * (non-Javadoc)
++     * 
++     * @see oqube.muse.MuseSink#endMath()
++     */
++    public void endMath()
++    {
++        sink.rawText( "`" );
++    }
++
++    /*
++     * (non-Javadoc)
++     * 
++     * @see oqube.muse.MuseSink#startMath()
++     */
++    public void startMath()
++    {
++        sink.rawText( "`" );
++    }
++
++}
+
+Modification de propriétés sur doxia-core/src/main/java/org/apache/maven/doxia/module/muse/SinkWrapper.java
+___________________________________________________________________
+Nom : svn:eol-style
+   + native
+
+Index: doxia-core/src/main/java/org/apache/maven/doxia/module/muse/MuseDoxiaParser.java
+===================================================================
+--- doxia-core/src/main/java/org/apache/maven/doxia/module/muse/MuseDoxiaParser.java	(révision 0)
++++ doxia-core/src/main/java/org/apache/maven/doxia/module/muse/MuseDoxiaParser.java	(révision 0)
+@@ -0,0 +1,63 @@
++/*
++ *  Copyright 2006 OQube contact at oqube dot com
++ *
++ *  Licensed under the Apache License, Version 2.0 (the "License");
++ *  you may not use this file except in compliance with the License.
++ *  You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing, software
++ *  distributed under the License is distributed on an "AS IS" BASIS,
++ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ *  See the License for the specific language governing permissions and
++ *  limitations under the License.
++ */
++package org.apache.maven.doxia.module.muse;
++
++import java.io.Reader;
++
++import oqube.muse.MuseParser;
++import oqube.muse.MuseSink;
++
++import org.apache.maven.doxia.parser.AbstractParser;
++import org.apache.maven.doxia.parser.ParseException;
++import org.apache.maven.doxia.sink.Sink;
++
++/**
++ * Parse the muse file format.
++ * 
++ * @author oqube
++ * @plexus.component role="org.apache.maven.doxia.parser.Parser" role-hint="muse"
++ */
++public class MuseDoxiaParser extends AbstractParser
++{
++
++    /**
++     * @plexus.requirement role="oqube.muse.MuseSink" role-hint="muse-doxia"
++     */
++    private MuseSink museSink;
++
++    private MuseParser parser = new MuseParser();
++
++    /**
++     * @see org.apache.maven.doxia.parser.Parser#parse(java.io.Reader, org.apache.maven.doxia.sink.Sink)
++     */
++    public final synchronized void parse( final Reader reader, final Sink sink ) throws ParseException
++    {
++        try
++        {
++            // instantiate wrapper
++            ( (SinkWrapper) museSink ).setSink( sink );
++            museSink.startDocument();
++            parser.setSink( museSink );
++            parser.setReader( reader );
++            parser.start();
++            museSink.endDocument();
++        }
++        catch ( final Exception e )
++        {
++            throw new ParseException( e );
++        }
++    }
++}
+
+Modification de propriétés sur doxia-core/src/main/java/org/apache/maven/doxia/module/muse/MuseDoxiaParser.java
+___________________________________________________________________
+Nom : svn:eol-style
+   + native
+
+Index: doxia-core/src/main/java/org/apache/maven/doxia/module/muse/DefaultTagHandler.java
+===================================================================
+--- doxia-core/src/main/java/org/apache/maven/doxia/module/muse/DefaultTagHandler.java	(révision 0)
++++ doxia-core/src/main/java/org/apache/maven/doxia/module/muse/DefaultTagHandler.java	(révision 0)
+@@ -0,0 +1,84 @@
++/*
++ *  Copyright 2006 OQube contact at oqube dot com
++ *
++ *  Licensed under the Apache License, Version 2.0 (the "License");
++ *  you may not use this file except in compliance with the License.
++ *  You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing, software
++ *  distributed under the License is distributed on an "AS IS" BASIS,
++ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ *  See the License for the specific language governing permissions and
++ *  limitations under the License.
++ */
++package org.apache.maven.doxia.module.muse;
++
++import oqube.muse.AbstractTagHandler;
++import oqube.muse.MuseSink;
++import oqube.muse.SimpleTagHandler;
++import oqube.muse.html.HTMLSourceTag;
++
++import org.apache.maven.doxia.sink.Sink;
++
++/**
++ * Tag handler for doxia sinks. This class adds support for some metadata information: title, author and date and
++ * modifies the behavior of example tag.
++ * 
++ * @author abailly@oqube.com
++ * @version $Id$
++ * @plexus.component role="oqube.muse.MuseTagHandler" role-hint="muse-xhtml"
++ */
++public class DefaultTagHandler extends AbstractTagHandler
++{
++
++    public DefaultTagHandler()
++    {
++        addTag( "example", new SimpleTagHandler()
++        {
++            public void doHandle( MuseSink sink, String content )
++            {
++                Sink sk = ( (SinkWrapper) sink ).getSink();
++                sk.verbatim( true );
++                sk.text( content );
++                sk.verbatim_();
++            }
++        } );
++
++        addTag( "title", new SimpleTagHandler()
++        {
++            public void doHandle( MuseSink sink, String content )
++            {
++                Sink sk = ( (SinkWrapper) sink ).getSink();
++                sk.title();
++                sk.text( content );
++                sk.title_();
++            }
++        } );
++
++        addTag( "author", new SimpleTagHandler()
++        {
++            public void doHandle( MuseSink sink, String content )
++            {
++                Sink sk = ( (SinkWrapper) sink ).getSink();
++                sk.author();
++                sk.text( content );
++                sk.author_();
++            }
++        } );
++
++        addTag( "date", new SimpleTagHandler()
++        {
++            public void doHandle( MuseSink sink, String content )
++            {
++                Sink sk = ( (SinkWrapper) sink ).getSink();
++                sk.date();
++                sk.text( content );
++                sk.date_();
++            }
++        } );
++        setNext( new HTMLSourceTag() );
++    }
++
++}
+
+Modification de propriétés sur doxia-core/src/main/java/org/apache/maven/doxia/module/muse/DefaultTagHandler.java
+___________________________________________________________________
+Nom : svn:mime-type
+   + text/plain
+Nom : svn:keywords
+   + Date Revision Id
+Nom : svn:eol-style
+   + native
+
+Index: doxia-core/src/main/java/org/apache/maven/doxia/module/muse/package.html
+===================================================================
+--- doxia-core/src/main/java/org/apache/maven/doxia/module/muse/package.html	(révision 0)
++++ doxia-core/src/main/java/org/apache/maven/doxia/module/muse/package.html	(révision 0)
+@@ -0,0 +1,53 @@
++<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
++<html>
++<head>
++<!--
++
++  @(#)package.html	1.60 98/01/27
++
++  Copyright 1998 Sun Microsystems, Inc. 901 San Antonio Road, 
++  Palo Alto, California, 94303, U.S.A.  All Rights Reserved.
++
++  This software is the confidential and proprietary information of Sun
++  Microsystems, Inc. ("Confidential Information").  You shall not
++  disclose such Confidential Information and shall use it only in
++  accordance with the terms of the license agreement you entered into
++  with Sun.
++
++  CopyrightVersion 1.2
++
++-->
++  </head>
++  <body bgcolor="white">
++    
++    This package provides temporary support for using Muse format in Maven site documentation
++    generation process based on Doxia.
++    
++    <p>
++      To use, simply put documentation in muse format in a directory named
++      <code>muse</code> where maven will find it (usually
++      <code>src/site/</code> if your project follows standard maven
++      layout convention. 
++    </p>
++    <p>
++      Each file should be suffixed <code>.muse</code> and should of course
++      follows the formatting conventions of muse. 
++    </p>
++    <h2>Related Documentation</h2>
++    
++    For more documentation see:
++    <ul>
++      <li><a
++      href="http://www.mwolson.org/projects/EmacsMuse.html">Emacs muse
++      official page</a>, where one can finds information on muse
++	syntax and on the wonderful emacs-muse package,</li>
++      <li><a href="http://www.oqube.com/projects/muse-parser">Java
++	  Muse parser</a>, the implementation in Java of muse format and
++	muse parsing. A status page asserts conformance of this parser
++	with standard muse syntax.</li>
++    </ul>
++    
++<!-- Put @see and @since tags down here. -->
++
++</body>
++</html>
+\ Pas de fin de ligne à la fin du fichier
+Index: doxia-core/src/main/java/org/apache/maven/doxia/module/xhtml/XhtmlSink.java
+===================================================================
+--- doxia-core/src/main/java/org/apache/maven/doxia/module/xhtml/XhtmlSink.java	(révision 447432)
++++ doxia-core/src/main/java/org/apache/maven/doxia/module/xhtml/XhtmlSink.java	(copie de travail)
+@@ -41,8 +41,6 @@
+ 
+     private boolean headFlag;
+ 
+-    private int itemFlag;
+-
+     private boolean verbatimFlag;
+ 
+     private int cellCount;
+@@ -80,8 +78,6 @@
+ 
+         resetBuffer();
+ 
+-        itemFlag = 0;
+-
+         verbatimFlag = false;
+ 
+         cellCount = 0;
+@@ -281,9 +277,6 @@
+     public void listItem()
+     {
+         write( "<li>" );
+-
+-        itemFlag++;
+-        // What follows is at least a paragraph.
+     }
+ 
+     public void listItem_()
+@@ -323,9 +316,6 @@
+     public void numberedListItem()
+     {
+         write( "<li>" );
+-
+-        itemFlag++;
+-        // What follows is at least a paragraph.
+     }
+ 
+     public void numberedListItem_()
+@@ -356,9 +346,6 @@
+     public void definition()
+     {
+         write( "<dd>" );
+-
+-        itemFlag++;
+-        // What follows is at least a paragraph.
+     }
+ 
+     public void definition_()
+@@ -368,22 +355,12 @@
+ 
+     public void paragraph()
+     {
+-        if ( itemFlag == 0 )
+-        {
+             write( "<p>" );
+-        }
+     }
+ 
+     public void paragraph_()
+     {
+-        if ( itemFlag == 0 )
+-        {
+             write( "</p>" );
+-        }
+-        else
+-        {
+-            itemFlag--;
+-        }
+     }
+ 
+     public void verbatim( boolean boxed )
+Index: doxia-core/pom.xml
+===================================================================
+--- doxia-core/pom.xml	(révision 447432)
++++ doxia-core/pom.xml	(copie de travail)
+@@ -37,6 +37,11 @@
+       <version>2.0.7</version>
+     </dependency>
+     <dependency>
++      <groupId>oqube.muse</groupId>
++      <artifactId>muse-parser</artifactId>
++      <version>1.0-rc3</version>
++    </dependency>
++        <dependency>
+       <groupId>org.apache.maven.doxia</groupId>
+       <artifactId>doxia-sink-api</artifactId>
+       <version>1.0-alpha-8</version>

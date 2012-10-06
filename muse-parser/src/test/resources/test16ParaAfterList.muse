@@ -1,0 +1,12 @@
+OQube vous propose une large palette de prestations d'ingénierie
+ - la mise en oeuvre de stratégies de tests automatisés à différents
+   stades du cycle de production : tests unitaires, tests
+   d'intégration et tests  systèmes, basée sur des logiciels libres;
+ - la formation sur mesure ou générique dans les domaines de
+   compétence de l'entreprise. 
+
+Ces prestations peuvent prendre de nombreuses formes adaptées à vos
+besoins: des missions de courte durée: audit de code et de
+processus, ent agile, conception et réalisation de composants
+logiciels spécifiques
+

@@ -1,0 +1,8 @@
+ - this example test tables 
+   inside listes
+ - this is an inline table:
+   hdr1 ||hdr2 || hdr3
+   data11 | data21| data31
+   data12 |data22| data32
+   data13 |data23 |data33
+ - another item

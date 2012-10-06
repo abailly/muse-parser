@@ -1,0 +1,82 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+ <parent>  
+  <groupId>oqube.muse</groupId>
+  <artifactId>muse-java</artifactId>
+  <version>1.0-SNAPSHOT</version>
+ </parent> 
+
+ <groupId>oqube.muse</groupId>
+ <artifactId>muse-maven-plugin</artifactId>
+ <packaging>maven-plugin</packaging>
+ <version>1.0-SNAPSHOT</version>
+ <name>Muse Maven Plugin</name>
+ <description>Maven plugin for literate programming with Muse</description>
+
+
+ <dependencies>
+    
+  <dependency>
+   <groupId>org.apache.maven</groupId>
+   <artifactId>maven-plugin-api</artifactId>
+   <version>2.0</version>
+  </dependency>
+
+  <dependency>
+   <groupId>org.apache.maven.reporting</groupId>
+   <artifactId>maven-reporting-api</artifactId>
+   <version>2.0.4</version>
+  </dependency>
+  
+  <dependency>
+   <groupId>org.apache.maven.reporting</groupId>
+   <artifactId>maven-reporting-impl</artifactId>
+   <version>2.0.4</version>
+  </dependency>
+    
+  <dependency>
+   <groupId>org.apache.maven.shared</groupId>
+   <artifactId>maven-plugin-testing-harness</artifactId>
+   <version>1.0-beta-1</version>
+  </dependency>
+  
+  <dependency>
+   <groupId>org.apache.maven</groupId>
+   <artifactId>maven-project</artifactId>
+   <version>2.0</version>
+  </dependency>
+  <dependency>
+   <groupId>oqube.muse</groupId>
+   <artifactId>muse-parser</artifactId>
+   <version>1.0-SNAPSHOT</version>
+  </dependency>
+  
+  <dependency>
+   <groupId>oqube.muse</groupId>
+   <artifactId>literate-muse</artifactId>
+   <version>1.0-SNAPSHOT</version>
+  </dependency>
+  
+ </dependencies>
+ 
+
+ <reporting>
+  <plugins>
+
+   <plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-plugin-plugin</artifactId>
+   </plugin>
+
+   <plugin>
+    <groupId>org.codehaus.mojo</groupId>
+    <artifactId>changes-maven-plugin</artifactId>
+    <version>2.0-beta-1</version>
+   </plugin>
+   
+  </plugins>
+
+</reporting>
+
+</project>

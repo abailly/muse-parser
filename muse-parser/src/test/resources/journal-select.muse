@@ -1,0 +1,22 @@
+
+* 20080929: Testing OQube web site
+
+Started to write tests for OQube's site that could be run under CI to
+ensure proper operation of the site. 
+
+* 20080917: Interesting variation around Form validation problem
+
+Onnstraints. Then an object is constructed with Builder pattern that
+checks appropriate constraints and throws unchecked exception upon
+error. 
+
+* 20080821: Example of bad coding
+
+Un dojo inspiré de 
+caractères composée de paires de parenthèses et crochets équilibrés ?
+
+* 20080909: Builder Tester agent
+
+infrastructure for executing JUnit tests: wrapping JUnitCore executor
+so that test cases get detected by the framewok, while handling class
+loading issues. 

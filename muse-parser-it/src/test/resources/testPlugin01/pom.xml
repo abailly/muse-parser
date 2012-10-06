@@ -1,0 +1,20 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+ <groupId>oqube.muse</groupId>
+ <artifactId>muse-literate-test</artifactId>
+ <packaging>jar</packaging>
+ <version>1.0</version>
+ <description>Test muse publishing with maven plugin</description>
+  <build>
+    <plugins>
+      <plugin>
+	<groupId>oqube.muse</groupId>
+	<artifactId>muse-maven-plugin</artifactId>
+	<configuration> 
+	  <source>${basedir}/src/site/muse</source>
+	</configuration>
+      </plugin>
+    </plugins>
+ </build>
+  
+</project>

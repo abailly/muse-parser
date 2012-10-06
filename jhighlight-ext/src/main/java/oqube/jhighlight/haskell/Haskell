@@ -1,0 +1,260 @@
+/************************************************************************
+* HASKEL 98 Lexical Analyzer
+* Derived from :
+* -- A Cactus representation of the Haskell grammar from the Haskell 98 report,
+* -- starting with the Context-Free Syntax from appendix B.4, followed by
+* -- rules from Lexical Syntax from appendix B.2.
+* -- (Haskell layout rules are not represented.)
+* Author : Arnaud Bailly
+* Version : $Id: Yylex 1154 2005-11-24 21:43:37Z nono $
+**************************************************************************/
+
+package oqube.jhighlight.haskell;
+
+import java.io.Reader;
+import java.io.IOException;
+import java.util.StringTokenizer;
+import java.util.logging.Logger;
+import com.uwyn.jhighlight.highlighter.ExplicitStateHighlighter;
+
+%%
+%class HaskellHighlighter
+%implements ExplicitStateHighlighter
+
+%unicode
+%pack
+
+%buffer 128
+
+%public
+
+%int
+
+%line
+%{
+
+  public static final int HASKELL_COMMENT = 1;
+
+  public static final int HASKELL_LITERAL = 2;
+
+  public static final int HASKELL_DELIMITER = 3;
+
+  public static final int HASKELL_PLAIN = 4;
+
+  public static final int HASKELL_KEYWORD = 5;
+
+  public static final int HASKELL_CONOP = 6;
+
+  public static final int HASKELL_CTOR = 7;
+
+  public static final int HASKELL_OP = 8;
+
+  public static final int HASKELL_VAR = 9;
+
+  public static final int HASKELL_VAROP = 10;
+
+  /** error manager */
+  private Logger log = Logger.getLogger("fidl.parser.jaskell");
+
+  /* get line number */
+  public int getLine() {
+    return yyline;
+  }
+  
+ /* set start line number */
+  public void setLine(int sl) {
+	yyline = sl;
+  }
+
+  public int getColumn() {
+    return yycolumn;
+  }
+
+  public void setColumn(int col) {
+    yycolumn = col;
+  }
+    
+  public void yyerror(String msg) {
+    StringBuffer err = new StringBuffer("jaskell- ");
+     err.append('(').append(yyline).append(',').append(yycolumn).append(") ")
+      .append(" : ")
+      .append(msg);
+
+    log.severe(err.toString());
+  }
+	/* Highlighter implementation */
+	
+	public int getStyleCount()
+	{
+		return 10;
+	}
+	
+	public byte getStartState()
+	{
+		return YYINITIAL+1;
+	}
+	
+	public byte getCurrentState()
+	{
+		return (byte) (yystate()+1);
+	}
+	
+	public void setState(byte newState)
+	{
+		yybegin(newState-1);
+	}
+	
+	public byte getNextToken()
+	throws IOException
+	{
+		return (byte) yylex();
+	}
+	
+	public int getTokenLength()
+	{
+		return yylength();
+	}
+	
+	public void setReader(Reader r)
+	{
+		this.zzReader = r;
+	}
+
+	public HaskellHighlighter()
+	{
+	}
+
+%}
+
+octal=[0-7]
+large=[A-Z]
+small=[a-z]
+digit=[0-9]
+hexit=({digit}|[a-fA-F])
+hexadecimal={hexit}+
+decimal={digit}+
+symbol=["!#$%&*+./<=>?@\\^|-"\"] 
+special=["(),;[]`{}"\"]  
+graphic=({small}|{large}|{symbol}|{digit}|{special}|":"|\"|"'") 
+idchar=({small}|{large}|{digit}|"'") 
+charesc=[abfnrtv\\\&\"\'] 
+ht=\x09 
+lf=\x0a 
+ff=\x0c 
+cr=\x0d 
+sp=" " 
+whitechar=[ \t\b\f] 
+line_terminator=({lf}|{cr}|{cr}{lf})  
+space={sp} 
+escape=\\({charesc}|{decimal}|o{octal}|x{hexadecimal}) 
+gap=\\{whitechar}+\\ 
+cid={large}{idchar}* 
+id={small}{idchar}* 
+qualifier={cid}"." 
+varsy={symbol}({symbol}|:)* 
+consy=:({symbol}|:)* 
+
+%state IN_COMMENT
+
+%%
+
+<YYINITIAL> { 
+"module"    |
+"where"     |
+"type"      |
+"data"      |
+"newtype"   |
+"class"     |
+"instance"   |
+"default"  |
+"deriving" |
+"as" |
+"import" |
+"let" |
+"in" |
+"if" |
+"then" |
+"else" | 
+"case" |   
+"of" |
+"do" |
+"infixl" |
+"infixr" |
+"infix" |
+"NATIVE" { yycolumn = yychar;  return HASKELL_KEYWORD; }
+
+"{-" {yycolumn = yychar;  yybegin(IN_COMMENT); return HASKELL_COMMENT;}
+
+"@" |
+"~" |
+"="  |
+".." |
+"=>" |
+"->" |
+"<-"     |
+"!"      |
+"-"      |
+"|"      |
+\\ |
+"_" | 
+"`" |
+ = yychar;  return HASKELL_OP;}
+
+"{" |
+"}" |
+"(" |
+")" |
+"[" |
+"]" |
+";" |
+"," |
+"::" |
+"<" |
+">" {yycolumn = yychar; return HASKELL_DELIMITER;}
+	
+"True"  |
+"False" |
+0(o|O){octal}+ |
+0(x|X){hexadecimal}  |
+{decimal}      |
+{decimal}\.{decimal}((e|E)(\+|\-)?{decimal})? | 
+\'([^\'\\]|{space}|{escape})\'       |
+\"([^\"\\]|{space}|{escape}|{gap})*\"          {  
+  yycolumn = yychar;  return HASKELL_LITERAL;
+}
+
+--.*{line_terminator} { yycolumn = yychar;  return HASKELL_COMMENT; }
+
+
+{qualifier}?{cid}     { 
+  yycolumn = yychar;  return HASKELL_CTOR;
+}
+
+
+{qualifier}?{id}      { 
+  yycolumn = yychar;  return HASKELL_VAR;
+}
+
+{qualifier}?{varsy}   { 
+  yycolumn = yychar;  return HASKELL_VAROP;
+}
+
+{qualifier}?{consy}   { 
+  yycolumn = yychar;  return HASKELL_CONOP;
+}
+
+
+{whitechar}+         {yycolumn = yychar; return HASKELL_PLAIN;} 
+{line_terminator}+   {yychar = 0;  return HASKELL_PLAIN;}
+
+}
+
+<IN_COMMENT> {
+.|\n { return HASKELL_COMMENT;}
+"-}" {yybegin(YYINITIAL); yycolumn = yychar;  return HASKELL_COMMENT;}
+}
+
+. {return HASKELL_PLAIN; }
+
+
+

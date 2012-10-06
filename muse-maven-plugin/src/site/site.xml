@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="Muse Maven Plugin">
+<!--
+ <bannerLeft>
+  <name>JAuto</name>
+  <src>http://maven.apache.org/images/apache-maven-project.png</src>
+  <href>http://maven.apache.org/</href>
+ </bannerLeft>
+ <bannerRight>
+  <src>http://maven.apache.org/images/maven-small.gif</src>
+ </bannerRight>
+-->
+  <skin>
+      <groupId>org.apache.maven.skins</groupId>
+      <artifactId>maven-stylus-skin</artifactId>
+      <version>1.0</version>
+  </skin>
+
+ <body>
+  <links>
+   <item name="Maven" href="http://maven.apache.org/"/>
+  </links>
+
+
+  <menu name="Muse-in-java" ref="parent" />
+
+  <menu name="Documentation" >
+   <item name="Introduction" href="index.html"/>
+   <item name="Goals" href="plugin-info.html"/>
+   <item name="Parameters (publish)" href="publish-mojo.html"/>
+  </menu>
+
+  <menu name="Standard reports" ref="reports" />
+
+ </body>
+</project>

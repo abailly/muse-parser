@@ -1,0 +1,123 @@
+#author abailly@oqube.com
+
+An example file for source handling in literate programs.
+This file contain fragments with references in them.
+
+The base file is a java source file:
+
+<source name="toto/Toto.java">
+package toto;
+
+public class Test {
+   <<fields>>
+   <<methods>>
+}
+</source>
+
+** Fields
+
+Then we have different fields. The first one is a dummy filed:
+
+<source name="fields">
+  /** 
+   * This is a field.
+   */
+   private int f1;
+</source>
+
+The second one is another dummy field.
+
+<source name="fields">
+  /** 
+   * This is another dummy field.
+   */
+   private String f1;
+</source>
+
+
+** Methods
+
+Methods are also broken into chunks. Here we start with one complex 
+method computing the power of a Matrix.
+
+<source name="methods">
+
+  public double[][] power(double[][] matrix, int pow) {
+  <<power>>
+  }
+</source>
+
+We first initialize variables and do some sanity check on input:
+
+<source name="power">
+        int l = matrix.length;
+        int c = matrix[0].length;
+        if(l != c)
+            throw new IllegalStateException("Cannot compute power of a non square matrix");
+        double[][] tmp = new double[l][l];
+        for (int i = 0; i < l; i++)
+            Arrays.fill(tmp[i], 0);
+</source>
+
+Then we structure the algorithm in *four* nested loops:
+<source name="power">
+        for (int k = 0; k <n; k++) {
+            for (int i = 0; i < l; i++) {
+                for (int j = 0; j < l; j++) {
+                    for (int m = 0; m < l; m++) {
+					<<compute>>
+                    }
+                }
+            }
+        }
+</source> 
+
+The computation is simple: Accumulate multiplication of both 
+operands in the result matrix.
+
+<source name="compute">
+                        if (k==0)
+                            tmp[i][j] = tmp[i][j]+ 
+                                matrix[i][m]* matrix[m][j];
+                        else
+                            tmp[i][j] = tmp[i][j] + 
+                                res[i][m] * matrix[m][j];
+</source>
+
+Then store the computation as the new right operand:
+<source name="power">
+            /* copy to res */
+            for (int i = 0; i < l; i++)
+                System.arraycopy(tmp[i],0,res.matrix[i],0,l);
+</source>
+
+And finally return the result:
+<source name="power">
+        return res;
+</source>
+
+Example of source fragment in another language:
+
+<source language="haskell">
+class Typeable a => Data a where
+  -- | Left-associative fold operation for constructor applications
+  gfoldl  :: (forall a b. Data a => c (a -> b) -> a -> c b)
+          -> (forall g. g -> c g)
+          -> a -> c a
+
+  -- | Obtaining the constructor from a given datum.
+  toConstr   :: a -> Constr
+
+  -- | Provide access to list of all constructors
+  dataTypeOf  :: a -> DataType
+
+  -- | A generic transformation that maps over the immediate subterms
+  gmapT :: (forall b. Data b => b -> b) -> a -> a
+
+  -- | A generic query that processes the immediate subterms and returns a list
+  gmapQ :: (forall a. Data a => a -> u) -> a -> [u]
+
+  -- | A generic monadic transformation that maps over the immediate subterms
+  gmapM   :: Monad m => (forall a. Data a => a -> m a) -> a -> m a
+
+</source>

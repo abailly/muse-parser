@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+ <modelVersion>4.0.0</modelVersion>
+ <groupId>oqube</groupId>
+ <artifactId>oqube-site-fr</artifactId>
+ <packaging>jar</packaging>
+ <version>1.1</version>
+ <name>OQube Site Francais</name>
+ <url>http://www.oqube.com/</url>
+
+ <inceptionYear>2006</inceptionYear>
+ <organization>
+  <name>OQube</name>
+  <url>http://www.oqube.com/contact.html</url>
+ </organization>
+
+ <build>
+  <plugins>
+
+   <!-- build french and english site -->
+   <plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-site-plugin</artifactId>
+    <configuration>
+     <locales>fr,en</locales>
+    </configuration>
+   </plugin>
+
+   <plugin>
+    <groupId>oqube.muse</groupId>
+    <artifactId>muse-maven-plugin</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <executions>
+     <execution>
+      <id>tests</id>
+      <goals>
+       <goal>publish</goal>
+      </goals>
+      <configuration>
+       <sourceOutput>target/generated-test-sources</sourceOutput>
+       <testSource>true</testSource>
+       <filterIn>.*Test.java</filterIn>
+       <lenient>true</lenient>
+      </configuration>
+     </execution>
+    </executions>
+   </plugin>
+  </plugins>
+ </build>
+
+ <distributionManagement>
+  <site>
+   <id>oqube.com</id>
+   <url>scp://www.oqube.com/var/www/</url>
+  </site>
+ </distributionManagement>
+ <repositories>
+   <repository> 
+   <id>oqube.com</id>
+   <url>http://www.oqube.com/maven2/</url>
+   </repository>
+
+ </repositories> 
+
+  <dependencies>
+  <dependency>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-site-plugin</artifactId>
+    <version>2.0-beta-5</version>
+   </dependency>
+
+  <dependency>
+    <groupId>org.apache.maven.doxia</groupId>
+    <artifactId>doxia-site-renderer</artifactId>
+    <version>1.0-alpha-8-muse</version>
+   </dependency>
+
+  </dependencies>
+
+ <reporting>
+  <excludeDefaults>true</excludeDefaults>
+ </reporting>
+
+</project>

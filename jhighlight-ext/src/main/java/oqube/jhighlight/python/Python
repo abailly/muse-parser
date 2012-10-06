@@ -1,0 +1,264 @@
+/** Python 2.4 Lexical analyzer
+ *
+ *  Adapted from http://www.python.org/doc/current/ref/grammar.txt
+ * 
+ */
+package oqube.jhighlight.python;
+
+import java.io.Reader;
+import java.io.IOException;
+import com.uwyn.jhighlight.highlighter.ExplicitStateHighlighter;
+
+
+%%
+%class PythonHighlighter
+%implements ExplicitStateHighlighter
+
+%unicode
+%pack
+
+%buffer 128
+
+%public
+
+%int
+
+%line
+%{
+
+  public static final int COMMENT = 1;
+
+  public static final int LITERAL = 2;
+
+  public static final int DELIMITER = 3;
+
+  public static final int PLAIN = 4;
+
+  public static final int KEYWORD = 5;
+
+  public static final int OPERATOR = 6;
+
+  public static final int DECORATOR = 7;
+
+  public static final int IDENTIFIER = 8;
+
+  /* get line number */
+  public int getLine() {
+    return yyline;
+  }
+  
+ /* set start line number */
+  public void setLine(int sl) {
+	yyline = sl;
+  }
+
+  public int getColumn() {
+    return yycolumn;
+  }
+
+  public void setColumn(int col) {
+    yycolumn = col;
+  }
+    
+	/* Highlighter implementation */
+	
+	public int getStyleCount()
+	{
+		return 8;
+	}
+	
+	public byte getStartState()
+	{
+		return YYINITIAL+1;
+	}
+	
+	public byte getCurrentState()
+	{
+		return (byte) (yystate()+1);
+	}
+	
+	public void setState(byte newState)
+	{
+		yybegin(newState-1);
+	}
+	
+	public byte getNextToken()
+	throws IOException
+	{
+		return (byte) yylex();
+	}
+	
+	public int getTokenLength()
+	{
+		return yylength();
+	}
+	
+	public void setReader(Reader r)
+	{
+		this.zzReader = r;
+	}
+
+	public PythonHighlighter()
+	{
+	}
+
+%}
+
+name={lowercase}({lowercase} | "_")*  
+letter={lowercase} | {uppercase}
+digit=[0-9]
+uppercase=[A-Z]
+lowercase=[a-z]
+identifier=({letter}|"_") ({letter} | {digit} | "_")*
+stringliteral={stringprefix}?({shortstring})
+stringprefix="r" | "u" | "ur" | "R" | "U" | "UR" | "Ur" | "uR"
+shortstring="'" {shortstringitem}* "'" | '"' {shortstringitem}* '"'
+shortstringitem= {shortstringchar} | {escapeseq}
+longstringitem={longstringchar} | {escapeseq}
+shortstringchar=[^\n\r\\'\"] 
+longstringchar=[^\\]
+escapeseq="\\"[\x00-\xff]
+longinteger={integer} ("l" | "L")
+integer={decimalinteger} | {octinteger} | {hexinteger}
+decimalinteger= {nonzerodigit} {digit}* | "0"
+octinteger="0" {octdigit}+
+hexinteger="0" ("x" | "X") {hexdigit}+
+nonzerodigit=[1-9]
+octdigit=[0-7]
+hexdigit=({digit}|[a-fA-F])
+floatnumber={pointfloat} | {exponentfloat}
+pointfloat={intpart}?{fraction}| {intpart} "."
+exponentfloat= ({intpart} | {pointfloat}) {exponent}
+intpart={digit}+
+fraction="." {intpart}  
+exponent=("e" | "E") ["+" | "-"] {intpart}
+imagnumber=({floatnumber}| {intpart}) ("j" | "J")
+newline="\n"|"\r"|"\r\n"
+whitechar=[ \t\b\f] 
+
+%state IN_STRING1 IN_STRING2
+
+%%
+
+<YYINITIAL> {
+
+/* delimiters */
+"(" |
+")" | 
+"," |
+"[" |
+"]" |
+"{" |
+"}" |
+":" |
+"`" |
+";" { return  DELIMITER;}
+
+/* operators */
+"." |
+"..." |
+"*" |
+"**" |
+"=" |
+"-" |
+"+" | 
+"~" |
+"//" |
+"/" |
+"%" | 
+"<<" | 
+">>"  |
+"&" |
+"^" |
+"|" | 
+"<" | 
+">" | 
+"==" | 
+">=" | 
+"<=" | 
+"<>" | 
+"!=" |
+"is" |
+"not" |
+"in" |
+"or" |
+"and" |
+"not"  |
+"+=" | 
+"-=" | 
+"*=" | 
+"/=" | 
+"%=" | 
+"**=" |
+">>=" | 
+"<<=" | 
+"\&=" | 
+"^=" | 
+"|=" {return OPERATOR;}
+
+/* keywords */
+"for" |
+"if" |
+"lambda" |
+"assert" |
+"pass" |
+"del" |
+"print" | 
+"return" |
+"yield" |
+"raise" |
+"break" |
+"continue" |
+"import" | 
+"as" |
+"from" |
+"global" |
+"exec" | 
+"elif" |
+"else" |
+"while" |
+"try" |
+"except" | 
+"finally" |
+"with" |
+"def" |
+"class" |
+"self" |
+"super" {return KEYWORD;}
+
+{identifier} {return IDENTIFIER;}
+
+{stringliteral} | 
+{integer} | 
+{longinteger} | 
+{floatnumber} | 
+{imagnumber} {return LITERAL;}
+
+
+/* decorator */
+"@"{identifier}("."{identifier})* { return DECORATOR;}
+
+/* comment */ 
+"#".*{newline} {return COMMENT;}
+
+/* multiline strings */
+"'''" { yybegin(IN_STRING1); return LITERAL; }
+\"\"\" { yybegin(IN_STRING2); return LITERAL; }
+
+.|
+{whitechar}|
+{newline}  {return PLAIN;} 
+}
+
+<IN_STRING1> {
+"'''" { yybegin(YYINITIAL); return LITERAL; }
+
+{longstringitem} { return LITERAL; }
+}
+
+<IN_STRING2> {
+\"\"\" { yybegin(YYINITIAL); return LITERAL; }
+
+{longstringitem} { return LITERAL; }
+}
+

@@ -1,0 +1,12 @@
+
+.#21  RV Miguel Cardoso
+
+ - idem Dassambah
+ - exo: calculateur RPN (moyen)
+
+.#20  RV Eddie Kasprszak
+
+ - stage de validation de MIAGE
+ - 3 mois minimum
+ - Exo: zipWith  (KO)
+ - manque de confiance, difficilement autonome (??)

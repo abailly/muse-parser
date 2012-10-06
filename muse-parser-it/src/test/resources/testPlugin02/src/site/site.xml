@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="OQube">
+ <publishDate position="bottom" format="dd-MM-yyyy"/>
+ <skin>
+  <groupId>oqube</groupId>
+  <artifactId>skin-oqube</artifactId>
+  <version>1.1.2</version>
+ </skin>
+ <poweredBy>
+   <logo
+    name="Powered by Emacs Muse"
+    href="http://www.mwolson.org/projects/EmacsMuse.html"       
+    img="images/emacsmuse.png"/>
+  <logo
+   name="Build with Maven 2"
+   href="http://maven.apache.org"
+   img="images/mavenbuilt.png"/>
+  <logo
+   name="Made by OQube, software engineering"
+   href="http://www.oqube.com"
+   img="images/oqube.png"/>
+ </poweredBy>  
+ 
+ <body>
+  
+  <menu name="OQube">
+   <item name="home" href="index.html"/>
+   <item name="contact" href="contact.html"/>
+   <item name="services" href="services/index.html" collapse="true" >
+    <item name="agile" href="services/processus.html"/>
+    <item name="tests" href="services/tests.html"/>
+    <item name="techno" href="services/system/index.html"/>
+   </item>
+   <item name="publications" href="research/index.html"/>
+   <item name="projets" href="projects/index.html"/>
+  </menu>
+ </body>
+</project>
